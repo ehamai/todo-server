@@ -1,0 +1,45 @@
+name: Trigger auto deployment for codetocloud02
+
+# When this action will be executed
+on:
+  # Automatically trigger it when detected changes in repo
+  push:
+    branches: 
+      [ codetocloud02 ]
+    paths:
+    - '**'
+    - '.github/workflows/codetocloud02-AutoDeployTrigger-e9f8af98-2906-4eb5-8a08-b04f00ea3939.yml'
+
+  # Allow manual trigger 
+  workflow_dispatch:      
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    permissions: 
+      id-token: write #This is required for requesting the OIDC JWT Token
+
+    steps:
+      - name: Checkout to the branch
+        uses: actions/checkout@v2
+
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          client-id: ${{ secrets.CODETOCLOUD02_AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.CODETOCLOUD02_AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.CODETOCLOUD02_AZURE_SUBSCRIPTION_ID }}
+
+      - name: Build and push container image to registry
+        uses: azure/container-apps-deploy-action@v2
+        with:
+          appSourcePath: ${{ github.workspace }} 
+          registryUrl: 
+          registryUsername: ${{ secrets.CODETOCLOUD02_REGISTRY_USERNAME }}
+          registryPassword: ${{ secrets.CODETOCLOUD02_REGISTRY_PASSWORD }}
+          containerAppName: codetocloud02
+          resourceGroup: codetocloud02
+          imageToBuild: default/[parameters('containerAppName')]:${{ github.sha }}
+          
+
+
