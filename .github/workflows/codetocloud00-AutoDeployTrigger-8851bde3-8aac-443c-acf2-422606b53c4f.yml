@@ -30,8 +30,11 @@ jobs:
           tenant-id: ${{ secrets.CODETOCLOUD00_AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.CODETOCLOUD00_AZURE_SUBSCRIPTION_ID }}
 
+      - name: Install latest azure-cli-extensions wheel
+        run: az extension add --source '${{ github.workspace }}/azure-cli-extensions/containerapp-0.3.43-py2.py3-none-any.whl' --yes
+
       - name: Build and push container image to registry
-        uses: azure/container-apps-deploy-action@v2
+        uses: azure/container-apps-deploy-action@bb9db59a85a80d22919e839d259195b8100e992d
         with:
           appSourcePath: ${{ github.workspace }} 
           registryUrl: 
