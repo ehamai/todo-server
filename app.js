@@ -15,7 +15,7 @@ app.use(
 );
 
 app.get('/', (req, res) => {
-  res.send('Hello world!');
+  res.send('Hello world 2!');
 })
 
 app.get('/api/env', (req, res) =>{
