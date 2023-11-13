@@ -1,0 +1,45 @@
+name: Trigger auto deployment for codetocloud-koreacentral-2
+
+# When this action will be executed
+on:
+  # Automatically trigger it when detected changes in repo
+  push:
+    branches: 
+      [ codetocloud-koreacentral ]
+    paths:
+    - '**'
+    - '.github/workflows/codetocloud-koreacentral-2-AutoDeployTrigger-33b51fa4-dd8f-482f-9959-a6491912976d.yml'
+
+  # Allow manual trigger 
+  workflow_dispatch:      
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    permissions: 
+      id-token: write #This is required for requesting the OIDC JWT Token
+
+    steps:
+      - name: Checkout to the branch
+        uses: actions/checkout@v2
+
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          client-id: ${{ secrets.CODETOCLOUDKOREACENTRAL2_AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.CODETOCLOUDKOREACENTRAL2_AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.CODETOCLOUDKOREACENTRAL2_AZURE_SUBSCRIPTION_ID }}
+
+      - name: Build and push container image to registry
+        uses: azure/container-apps-deploy-action@v2
+        with:
+          appSourcePath: ${{ github.workspace }} 
+          registryUrl: 
+          registryUsername: ${{ secrets.CODETOCLOUDKOREACENTRAL2_REGISTRY_USERNAME }}
+          registryPassword: ${{ secrets.CODETOCLOUDKOREACENTRAL2_REGISTRY_PASSWORD }}
+          containerAppName: codetocloud-koreacentral-2
+          resourceGroup: codetocloud-koreacentral-2
+          imageToBuild: default/[parameters('containerAppName')]:${{ github.sha }}
+          
+
+
