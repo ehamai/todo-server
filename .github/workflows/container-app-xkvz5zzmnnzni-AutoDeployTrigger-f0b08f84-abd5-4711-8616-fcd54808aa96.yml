@@ -1,0 +1,45 @@
+name: Trigger auto deployment for container-app-xkvz5zzmnnzni
+
+# When this action will be executed
+on:
+  # Automatically trigger it when detected changes in repo
+  push:
+    branches: 
+      [ starshot01 ]
+    paths:
+    - '**'
+    - '.github/workflows/container-app-xkvz5zzmnnzni-AutoDeployTrigger-f0b08f84-abd5-4711-8616-fcd54808aa96.yml'
+
+  # Allow manual trigger 
+  workflow_dispatch:      
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    permissions: 
+      id-token: write #This is required for requesting the OIDC JWT Token
+
+    steps:
+      - name: Checkout to the branch
+        uses: actions/checkout@v2
+
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          client-id: ${{ secrets.CONTAINERAPPXKVZ5ZZMNNZNI_AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.CONTAINERAPPXKVZ5ZZMNNZNI_AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.CONTAINERAPPXKVZ5ZZMNNZNI_AZURE_SUBSCRIPTION_ID }}
+
+      - name: Build and push container image to registry
+        uses: azure/container-apps-deploy-action@v2
+        with:
+          appSourcePath: ${{ github.workspace }} 
+          registryUrl: containerregistryxkvz5zzmnnzni.azurecr.io
+          registryUsername: ${{ secrets.CONTAINERAPPXKVZ5ZZMNNZNI_REGISTRY_USERNAME }}
+          registryPassword: ${{ secrets.CONTAINERAPPXKVZ5ZZMNNZNI_REGISTRY_PASSWORD }}
+          containerAppName: container-app-xkvz5zzmnnzni
+          resourceGroup: starshot02
+          imageToBuild: containerregistryxkvz5zzmnnzni.azurecr.io/container-app-xkvz5zzmnnzni:${{ github.sha }}
+          
+
+
