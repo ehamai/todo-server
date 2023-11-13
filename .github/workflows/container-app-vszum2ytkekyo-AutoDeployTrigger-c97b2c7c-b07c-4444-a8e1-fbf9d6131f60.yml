@@ -1,0 +1,45 @@
+name: Trigger auto deployment for container-app-vszum2ytkekyo
+
+# When this action will be executed
+on:
+  # Automatically trigger it when detected changes in repo
+  push:
+    branches: 
+      [ starshot00 ]
+    paths:
+    - '**'
+    - '.github/workflows/container-app-vszum2ytkekyo-AutoDeployTrigger-c97b2c7c-b07c-4444-a8e1-fbf9d6131f60.yml'
+
+  # Allow manual trigger 
+  workflow_dispatch:      
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    permissions: 
+      id-token: write #This is required for requesting the OIDC JWT Token
+
+    steps:
+      - name: Checkout to the branch
+        uses: actions/checkout@v2
+
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          client-id: ${{ secrets.CONTAINERAPPVSZUM2YTKEKYO_AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.CONTAINERAPPVSZUM2YTKEKYO_AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.CONTAINERAPPVSZUM2YTKEKYO_AZURE_SUBSCRIPTION_ID }}
+
+      - name: Build and push container image to registry
+        uses: azure/container-apps-deploy-action@v2
+        with:
+          appSourcePath: ${{ github.workspace }} 
+          registryUrl: containerregistryvszum2ytkekyo.azurecr.io
+          registryUsername: ${{ secrets.CONTAINERAPPVSZUM2YTKEKYO_REGISTRY_USERNAME }}
+          registryPassword: ${{ secrets.CONTAINERAPPVSZUM2YTKEKYO_REGISTRY_PASSWORD }}
+          containerAppName: container-app-vszum2ytkekyo
+          resourceGroup: todo-server00
+          imageToBuild: containerregistryvszum2ytkekyo.azurecr.io/container-app-vszum2ytkekyo:${{ github.sha }}
+          
+
+
