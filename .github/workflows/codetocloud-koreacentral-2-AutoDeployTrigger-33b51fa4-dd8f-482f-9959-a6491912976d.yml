@@ -31,7 +31,7 @@ jobs:
           subscription-id: ${{ secrets.CODETOCLOUDKOREACENTRAL2_AZURE_SUBSCRIPTION_ID }}
 
       - name: Build and push container image to registry
-        uses: azure/container-apps-deploy-action@v2
+        uses: azure/container-apps-deploy-action@ecc33566f4fffe724c058129e9760a68c5c43ad2
         with:
           appSourcePath: ${{ github.workspace }} 
           registryUrl: 
